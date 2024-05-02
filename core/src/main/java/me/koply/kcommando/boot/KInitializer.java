@@ -105,7 +105,7 @@ public class KInitializer {
     private void registerSimilarBox(Object instance, AnnotationBox box) {
         // we can get annotation but we don't need that
         boolean usedCommand = box.type.value > 10;
-        int value = usedCommand ? box.type.value-2 : box.type.value;
+        int value = usedCommand ? box.type.value - 2 : box.type.value;
         SimilarBox.SimilarListType type = value == 9 ? SimilarBox.SimilarListType.LIST : SimilarBox.SimilarListType.SET;
 
         SimilarBox similarBox = new SimilarBox(instance, box.method, box.clazz, type, usedCommand);
@@ -157,6 +157,7 @@ public class KInitializer {
 
     /**
      * internal
+     *
      * @param method the method to be checked
      * @return if method public returns true
      */
@@ -192,7 +193,9 @@ public class KInitializer {
 
             if (annotationType == null) {
                 if (KCommando.verbose) {
-                    skippedMethods.add(method.getName());
+                    if (!(method.getDeclaringClass() == Object.class)) {
+                        skippedMethods.add(method.getName());
+                    }
                 }
                 continue;
             }
@@ -206,8 +209,10 @@ public class KInitializer {
             ret.add(box);
         }
         if (KCommando.verbose) {
-            Kogger.info("The skipped methods at " + clazz.getName() + ": "
-                    + String.join(",", skippedMethods) + " (They don't have any appropriate annotation)");
+            if (!skippedMethods.isEmpty()) {
+                Kogger.info("The skipped methods at " + clazz.getName() + ": "
+                        + String.join(",", skippedMethods) + " (They don't have any appropriate annotation)");
+            }
         }
         return ret;
     }
@@ -238,7 +243,6 @@ public class KInitializer {
         }
         return ret;
     }
-
 
 
 }

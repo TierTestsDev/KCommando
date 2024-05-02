@@ -66,7 +66,6 @@ public class JDAIntegration extends Integration {
 
         String name = info.name();
         String desc = info.desc();
-        boolean isglobal = info.global();
         boolean subCommand = info.subCommand();
         String parent = info.parentGroup();
 
@@ -81,6 +80,10 @@ public class JDAIntegration extends Integration {
             Choice[] choices = option.choices();
 
             for (Choice choice : choices) {
+                // Because of the default choice option
+                if (!(option.type() == me.koply.kcommando.internal.OptionType.STRING)) {
+                    continue;
+                }
                 // NOT EQUALS, WE NEED TO CHECK OBJECT EQUALITY
                 if (DefaultConstants.DEFAULT_TEXT == choice.name() &&
                         DefaultConstants.DEFAULT_TEXT == choice.value()) {
@@ -112,7 +115,7 @@ public class JDAIntegration extends Integration {
             if (registeredGroup.isPresent()) {
                 CommandDataImpl found = registeredGroup.get();
 
-                subcommandData = new SubcommandData(name, desc);
+                subcommandData = new SubcommandData(name, desc).addOptions(rolledOptionDatas);
                 found.addSubcommands(subcommandData);
 
                 commandData = found;
@@ -131,8 +134,9 @@ public class JDAIntegration extends Integration {
 
         long[] guildIds = info.guildId();
         if (guildIds[0] == 0) {
-            if (KCommando.verbose)
+            if (KCommando.verbose) {
                 Kogger.info("The SlashCommand that named as '" + name + "' is upserted as global command.");
+            }
             api.upsertCommand(commandData).queue();
         } else for (long guildId : guildIds) {
             Guild guild = api.getGuildById(guildId);
